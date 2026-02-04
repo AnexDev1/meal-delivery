@@ -14,13 +14,10 @@ interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
-    const jwtSecret = configService.get<string>(
-      'JWT_SECRET',
-      'default_jwt_secret',
-    );
-    if (!jwtSecret) {
-      throw new Error('JWT_SECRET is not defined in environment variables');
-    }
+    const jwtSecret =
+      configService.get<string>('JWT_ACCESS_SECRET') ||
+      configService.get<string>('JWT_SECRET') ||
+      'default_jwt_secret';
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
