@@ -91,16 +91,27 @@ export class AuthController {
   @Post('sso/:provider')
   @ApiOperation({ summary: 'SSO login with Google or Facebook' })
   @ApiBody({
-    schema: { type: 'object', properties: { idToken: { type: 'string' } } },
+    schema: {
+      type: 'object',
+      properties: {
+        idToken: { type: 'string' },
+        accessToken: { type: 'string' },
+        token: { type: 'string' },
+      },
+    },
   })
   async ssoLogin(
-    @Body('idToken') idToken: string,
+    @Body() body: { idToken?: string; accessToken?: string; token?: string },
     @Param('provider') provider: string,
     @Req() req: Request,
   ) {
+    const token = body?.idToken || body?.accessToken || body?.token;
+    if (!token) {
+      throw new Error('Missing SSO token');
+    }
     const userAgent = req.headers['user-agent'] || 'unknown';
     const ip = req.ip || 'unknown';
-    return this.authService.ssoLogin(idToken, provider, userAgent, ip);
+    return this.authService.ssoLogin(token, provider, userAgent, ip);
   }
 
   @Get('google')

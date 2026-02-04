@@ -457,6 +457,25 @@ async verifyGoogleToken(token: string) {
       picture: data.picture,
     };
   } catch (error) {
+    return this.verifyGoogleAccessToken(token);
+  }
+}
+
+private async verifyGoogleAccessToken(token: string) {
+  try {
+    const response = await firstValueFrom(
+      this.httpService.get('https://openidconnect.googleapis.com/v1/userinfo', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    );
+    const data = response.data;
+    return {
+      id: data.sub || data.id,
+      email: data.email,
+      name: data.name,
+      picture: data.picture,
+    };
+  } catch (error) {
     throw new UnauthorizedException('Invalid Google token');
   }
 }
