@@ -79,7 +79,21 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const PORT = configService.get<number>('PORT', 3008);
 
-  // app.enableCors();
+  // Enable CORS for browser-based clients
+  const defaultOrigins = ['http://localhost:3008'];
+  const envOrigins = (configService.get<string>('CORS_ORIGINS') || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const allowedOrigins = envOrigins.length ? envOrigins : defaultOrigins;
+
+  app.enableCors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization, Accept, X-Requested-With',
+  });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   // Always enable Swagger
