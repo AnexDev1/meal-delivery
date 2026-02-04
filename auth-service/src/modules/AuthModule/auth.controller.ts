@@ -42,7 +42,7 @@ import { UsersService } from '../UserModule/user.service';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Auth') // Groups under "Auth"
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

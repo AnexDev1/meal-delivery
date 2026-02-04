@@ -68,7 +68,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
 
   // Point Swagger "Try it out" to the correct server
-  document.servers = [{ url: 'https://mealsystem.basirahtv.com' }];
+  const swaggerServerUrl =
+    configService.get<string>('SWAGGER_SERVER_URL') ||
+    'https://mealsystem.basirahtv.com/auth';
+  document.servers = [{ url: swaggerServerUrl }];
 
   // Swagger UI (disabled in prod unless explicitly allowed)
   // if (
