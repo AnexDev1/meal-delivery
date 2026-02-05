@@ -60,7 +60,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   // if (NODE_ENV !== 'production') {
-    setupSwagger(app);
+  setupSwagger(app);
   // }
 
   // Connect and start the Kafka microservice listener
