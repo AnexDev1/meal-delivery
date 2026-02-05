@@ -22,13 +22,13 @@ import { Public } from 'src/common/decorators/public.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard)
 @ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Patch('me')
-@ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
 @ApiOperation({ summary: "Update authenticated user's profile" })
 @ApiResponse({ status: 200, type: UserDto, description: 'Profile updated successfully' })
 @ApiResponse({ status: 400, description: 'Username or phone number already in use' })
@@ -40,7 +40,18 @@ async updateProfile(
   return this.usersService.updateProfile(userId, dto);
 }
 
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: "Get authenticated user's profile" })
+  @ApiResponse({ status: 200, type: UserDto })
+  getProfile(@Req() req: any) {
+    const userId: string = req?.user?.userId;
+    return this.usersService.findById(userId);
+  }
+
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard)
   @ApiBearerAuth('access-token')
   @Permissions('roles.manage')
   @ApiOperation({ summary: 'List all users' })
@@ -48,20 +59,9 @@ async updateProfile(
   findAll() {
     return this.usersService.findAll();
   }
-  
-  @Get('me')
-  // @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: "Get authenticated user's profile" })
-  @ApiResponse({ status: 200, type: UserDto })
-  getProfile(@Req() req: any) {
-    const userId: string = req?.user?.userId;
-    console.log(req.user);
-    return this.usersService.findById(userId);
-  }
-
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard)
   @ApiBearerAuth('access-token')
   @Permissions('roles.manage')
   @ApiOperation({ summary: 'Get user by id' })
@@ -70,8 +70,8 @@ async updateProfile(
     return this.usersService.findById(id);
   }
 
-
   @Post(':id/assign-role')
+  @UseGuards(JwtAuthGuard, RolesGuard, PermissionGuard)
   @ApiBearerAuth('access-token')
   @Permissions('roles.manage')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
